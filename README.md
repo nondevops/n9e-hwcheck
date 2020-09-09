@@ -1,6 +1,6 @@
 # 硬件状态监控插件脚本
 
-使用dell的srvadmin工具等组件实现硬件监控，需要安装falcon-agent
+使用dell的srvadmin工具等组件实现硬件监控，需要安装n9e-collector
 
 仅支持dell物理机，可以监控的指标有：
 
@@ -15,16 +15,8 @@ cpu 内存 阵列卡 物理磁盘 虚拟磁盘 阵列卡电池 BIOS 主板电池
 wget -q -O - http://linux.dell.com/repo/hardware/latest/bootstrap.cgi | bash
 
 yum install srvadmin-omacore srvadmin-omcommon srvadmin-storage-cli smbios-utils-bin lm_sensors dmidecode cronie
-# 启动srvadmin服务
-/opt/dell/srvadmin/sbin/srvadmin-services.sh enable
-/opt/dell/srvadmin/sbin/srvadmin-services.sh restart
-# 配置lm-sensors
-echo yes | /usr/sbin/sensors-detect
-```
+ln -s /opt/dell/srvadmin/bin/omreport /usr/bin/omreport
 
-## 你也可以打包rpm来简化部署
-
-```
 git clone https://github.com/51web/hwcheck hwcheck-0.2
 tar czf hwcheck-0.2.tar.gz hwcheck-0.2
 rpmbuild -tb hwcheck-0.2.tar.gz
@@ -39,7 +31,7 @@ rpmbuild -tb hwcheck-0.2.tar.gz
 
 ```
 hwcheck -d      # 打印metrics信息，即是push到falcon-agent的数据
-        -p      # push数据到falcon-agent
+        -p      # push数据到n9e-collector
         -s      # 设置push数据中的STEP数值，表示监控频率,默认值是600秒
         -m      # 指定单个metric
 ```
@@ -53,13 +45,13 @@ cat /etc/cron.d/hwcheck
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:/opt/dell/srvadmin/sbin:/opt/dell/srvadmin/bin
 SHELL=/bin/bash
 
-18 * * * * root /usr/bin/hwcheck -s 3600 -p >/dev/null 2>&1 &
+1/ * * * * root /usr/bin/hwcheck -s 60 -p >/dev/null 2>&1 &
 ```
 
-表示每个小时执行一次检测，相应的STEP值被设置为3600
+表示每分钟执行一次检测，相应的STEP值被设置为60
 
 
-## falcon-portal中配置报警策略
+## n9e-portal中配置报警策略
 
 hwcheck push到falcon-agent的metric均以 hw 打头，如hw.cpu_temp，除温度是实际的数值外，
 
