@@ -617,7 +617,7 @@ def check(target=False):
 def push(message):
     try:
         urllib2.urlopen(
-            url  = 'http://127.0.0.1:1988/v1/push',
+            url  = 'http://127.0.0.1:2058/api/collector/push',
             data = json.dumps(message)
             )
     except:
