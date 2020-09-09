@@ -45,7 +45,7 @@ cat /etc/cron.d/hwcheck
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:/opt/dell/srvadmin/sbin:/opt/dell/srvadmin/bin
 SHELL=/bin/bash
 
-1/ * * * * root /usr/bin/hwcheck -s 60 -p >/dev/null 2>&1 &
+*1/ * * * * root /usr/bin/hwcheck -s 60 -p >/dev/null 2>&1 &
 ```
 
 表示每分钟执行一次检测，相应的STEP值被设置为60
